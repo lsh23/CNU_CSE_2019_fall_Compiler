@@ -6,6 +6,21 @@ public class Noo_compiler {
     Node<String> head;
     FileWriter fw;
 
+    enum Noo_symbol {
+        // 상수("연결할 문자")
+        IFXYZ("\"\"\"\"\""), ATHANB("\"\"\"\""), ADDONE("\"\""), ZERO("\"\"\""), PRINT("\"");
+
+        final private String name;
+
+        private Noo_symbol(String name) { //enum에서 생성자 같은 역할
+            this.name = name;
+        }
+
+        public String getString() { // 문자를 받아오는 함수
+            return name;
+        }
+    }
+
     public static class Node<T> {
 
         T token;
