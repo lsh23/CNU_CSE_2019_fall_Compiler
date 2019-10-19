@@ -36,5 +36,25 @@ public class Test {
     */
 
 
+    public static void main(String[] args) {
+        int a = 33;
+        System.out.println(Test.add(a,1));
+    }
+    /*
+    .method public static main([Ljava/lang/String;)V
+    .limit stack 32
+    .limit locals 32
+    ldc 33
+    istore_2
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    ldc 1
+    iload_2
+    invokestatic Test/add(II)I
+    invokevirtual java/io/PrintStream/println(I)V
+    return
+    .end method
+     */
+
+
 
 }
