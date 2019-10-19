@@ -18,4 +18,23 @@ public class Test {
 
 
 
+    public static int add(int a, int b){
+        int c = a + b;
+        return c;
+    }
+    /*
+    .method public static add(II)I
+    .limit stack 32
+    .limit locals 32
+    iload_0
+    iload_1
+    iadd
+    istore_2
+    iload_2
+    ireturn
+    .end method
+    */
+
+
+
 }
