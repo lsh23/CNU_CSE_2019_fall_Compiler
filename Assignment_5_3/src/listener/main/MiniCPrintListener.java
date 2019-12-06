@@ -1,7 +1,7 @@
 package listener.main;
+
 import generated.MiniCBaseListener;
 import generated.MiniCParser;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 import java.util.ArrayList;

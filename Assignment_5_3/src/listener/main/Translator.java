@@ -1,10 +1,12 @@
 package listener.main;
-import org.antlr.v4.runtime.*;
+
+import generated.MiniCLexer;
+import generated.MiniCParser;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
-
-import generated.*;
 
 public class Translator {
 	enum OPTIONS {

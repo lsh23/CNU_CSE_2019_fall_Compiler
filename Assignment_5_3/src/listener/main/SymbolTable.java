@@ -1,30 +1,33 @@
 package listener.main;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 
 import generated.MiniCParser;
 import generated.MiniCParser.Fun_declContext;
 import generated.MiniCParser.Local_declContext;
-import generated.MiniCParser.ParamsContext;
-import generated.MiniCParser.Type_specContext;
 import generated.MiniCParser.Var_declContext;
-import listener.main.SymbolTable.Type;
-import static listener.main.BytecodeGenListenerHelper.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static listener.main.BytecodeGenListenerHelper.getFunName;
 
 
 public class SymbolTable {
 	enum Type {
-		INT, INTARRAY, VOID, ERROR
+		INT, INTARRAY, VOID, ERROR, FLOAT
 	}
 	
 	static public class VarInfo {
 		Type type; 
 		int id;
-		int initVal;
+		double initVal;
 		
 		public VarInfo(Type type,  int id, int initVal) {
+			this.type = type;
+			this.id = id;
+			this.initVal = initVal;
+		}
+		public VarInfo(Type type,  int id, float initVal) {
 			this.type = type;
 			this.id = id;
 			this.initVal = initVal;
@@ -80,6 +83,19 @@ public class SymbolTable {
 		_gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
 	
 	}
+
+	void putLocalVarWithInitVal(String varname, Type type, float initVar){
+		//<Fill here>
+		_lsymtable.put(varname,new VarInfo(type,_localVarID++,initVar));
+	}
+	void putGlobalVarWithInitVal(String varname, Type type, float initVar){
+		//<Fill here>
+		_gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
+
+	}
+
+
+
 	
 	void putParams(MiniCParser.ParamsContext params) {
 		for ( MiniCParser.ParamContext param : params.param()){
@@ -87,6 +103,9 @@ public class SymbolTable {
 			Type paramType = null;
 			if(param.type_spec().getText().toUpperCase().equals("INT")){
 				paramType = Type.INT;
+			}
+			if(param.type_spec().getText().toUpperCase().equals("FLOAT")){
+				paramType = Type.FLOAT;
 			}
 			putLocalVar(paramName,paramType);
 		}
@@ -105,6 +124,16 @@ public class SymbolTable {
 	public String getFunSpecStr(String fname) {		
 		// <Fill here>
 		return _fsymtable.get(fname).sigStr;
+	}
+
+	public String getPrintFunSpecStr(SymbolTable.Type type){
+		if(type == Type.INT){
+			return "java/io/PrintStream/println(I)V";
+		}
+		if(type == Type.FLOAT){
+			return "java/io/PrintStream/println(F)V";
+		}
+		return "Transration Error : your input a non-exist type";
 	}
 
 	public String getFunSpecStr(Fun_declContext ctx) {

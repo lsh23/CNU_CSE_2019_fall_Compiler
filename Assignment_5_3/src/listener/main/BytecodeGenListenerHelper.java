@@ -1,18 +1,8 @@
 package listener.main;
 
-import java.util.Hashtable;
 
 import generated.MiniCParser;
-import generated.MiniCParser.ExprContext;
-import generated.MiniCParser.Fun_declContext;
-import generated.MiniCParser.If_stmtContext;
-import generated.MiniCParser.Local_declContext;
-import generated.MiniCParser.ParamContext;
-import generated.MiniCParser.ParamsContext;
-import generated.MiniCParser.Type_specContext;
-import generated.MiniCParser.Var_declContext;
-import listener.main.SymbolTable;
-import listener.main.SymbolTable.VarInfo;
+import generated.MiniCParser.*;
 
 public class BytecodeGenListenerHelper {
 
@@ -31,6 +21,9 @@ public class BytecodeGenListenerHelper {
 	static int initVal(Var_declContext ctx) {
 		return Integer.parseInt(ctx.LITERAL().getText());
 	}
+	static float initValFloat(Var_declContext ctx){
+		return Float.parseFloat(ctx.LITERAL().toString());
+	}
 
 	// var_decl	: type_spec IDENT '=' LITERAL ';
 	static boolean isDeclWithInit(Var_declContext ctx) {
@@ -45,6 +38,9 @@ public class BytecodeGenListenerHelper {
 	// local_decl	: type_spec IDENT '[' LITERAL ']' ';'
 	static int initVal(Local_declContext ctx) {
 		return Integer.parseInt(ctx.LITERAL().getText());
+	}
+	static float initValFloat(Local_declContext ctx){
+		return Float.parseFloat(ctx.LITERAL().toString());
 	}
 
 	static boolean isArrayDecl(Local_declContext ctx) {
