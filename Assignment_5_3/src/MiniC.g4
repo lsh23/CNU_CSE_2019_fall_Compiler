@@ -11,7 +11,8 @@ var_decl	:  type_spec IDENT ';'
 		| type_spec IDENT '=' LITERAL ';'	
 		| type_spec IDENT '[' LITERAL ']' ';'	;
 type_spec	: VOID				
-		| INT				;
+		| INT
+		| FLOAT				;
 fun_decl	: type_spec IDENT '(' params ')' compound_stmt ;
 params		: param (',' param)*		
 		| VOID				
@@ -63,7 +64,7 @@ args	: expr (',' expr)*
 
 VOID: 'void';
 INT: 'int';
-
+FLOAT: 'float';
 WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
@@ -81,7 +82,7 @@ IDENT  : [a-zA-Z_]
         )*;
 
 
-LITERAL:   DecimalConstant     |   OctalConstant     |   HexadecimalConstant     ;
+LITERAL:   DecimalConstant     |   OctalConstant     |   HexadecimalConstant  | RealNumConstant   ;
 
 
 DecimalConstant
@@ -96,7 +97,9 @@ OctalConstant
 HexadecimalConstant
     :   '0' [xX] [0-9a-fA-F] +
     ;
-
+RealNumConstant
+    :   [0-9]* '.' [0-9]+
+    ;
 WS  :   (   ' '
         |   '\t'
         |   '\r'
