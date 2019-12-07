@@ -14,7 +14,7 @@ import static listener.main.BytecodeGenListenerHelper.getFunName;
 
 public class SymbolTable {
 	enum Type {
-		INT, INTARRAY, VOID, ERROR, FLOAT
+		INT, INTARRAY, VOID, ERROR, FLOAT, DOUBLE
 	}
 	
 	static public class VarInfo {
@@ -32,6 +32,11 @@ public class SymbolTable {
 			this.id = id;
 			this.initVal = initVal;
 		}
+        public VarInfo(Type type,  int id, double initVal) {
+            this.type = type;
+            this.id = id;
+            this.initVal = initVal;
+        }
 		public VarInfo(Type type,  int id) {
 			this.type = type;
 			this.id = id;
@@ -81,7 +86,6 @@ public class SymbolTable {
 	void putGlobalVarWithInitVal(String varname, Type type, int initVar){
 		//<Fill here>
 		_gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
-	
 	}
 
 	void putLocalVarWithInitVal(String varname, Type type, float initVar){
@@ -91,8 +95,17 @@ public class SymbolTable {
 	void putGlobalVarWithInitVal(String varname, Type type, float initVar){
 		//<Fill here>
 		_gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
-
 	}
+
+
+    void putLocalVarWithInitVal(String varname, Type type, double initVar){
+        //<Fill here>
+        _lsymtable.put(varname,new VarInfo(type,_localVarID++,initVar));
+    }
+    void putGlobalVarWithInitVal(String varname, Type type, double initVar){
+        //<Fill here>
+        _gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
+    }
 
 
 
@@ -106,6 +119,9 @@ public class SymbolTable {
 			}
 			if(param.type_spec().getText().toUpperCase().equals("FLOAT")){
 				paramType = Type.FLOAT;
+			}
+			if(param.type_spec().getText().toUpperCase().equals("DOUBLE")){
+				paramType = Type.DOUBLE;
 			}
 			putLocalVar(paramName,paramType);
 		}
@@ -123,7 +139,7 @@ public class SymbolTable {
 	
 	public String getFunSpecStr(String fname) {		
 		// <Fill here>
-		return _fsymtable.get(fname).sigStr;
+		return _fsymtable.get(fname) == null? null : _fsymtable.get(fname).sigStr;
 	}
 
 	public String getPrintFunSpecStr(SymbolTable.Type type){
@@ -133,6 +149,9 @@ public class SymbolTable {
 		if(type == Type.FLOAT){
 			return "java/io/PrintStream/println(F)V";
 		}
+        if(type == Type.DOUBLE){
+            return "java/io/PrintStream/println(D)V";
+        }
 		return "Transration Error : your input a non-exist type";
 	}
 
