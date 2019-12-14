@@ -45,6 +45,9 @@ public class BytecodeGenListenerHelper {
 	static double initValDouble(Local_declContext ctx){
 	    return Double.parseDouble((ctx.LITERAL().toString()));
     }
+	static String initValString(Local_declContext ctx){
+		return ctx.LITERAL().toString();
+	}
 
 	static boolean isArrayDecl(Local_declContext ctx) {
 		return ctx.getChildCount() == 6;

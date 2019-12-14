@@ -14,13 +14,14 @@ import static listener.main.BytecodeGenListenerHelper.getFunName;
 
 public class SymbolTable {
 	enum Type {
-		INT, INTARRAY, VOID, ERROR, FLOAT, DOUBLE
+		INT, INTARRAY, VOID, ERROR, FLOAT, DOUBLE, STRING
 	}
 	
 	static public class VarInfo {
 		Type type; 
 		int id;
 		double initVal;
+		String initStringVal;
 		
 		public VarInfo(Type type,  int id, int initVal) {
 			this.type = type;
@@ -37,10 +38,16 @@ public class SymbolTable {
             this.id = id;
             this.initVal = initVal;
         }
+		public VarInfo(Type type,  int id, String initVal) {
+			this.type = type;
+			this.id = id;
+			this.initStringVal = initVal;
+		}
 		public VarInfo(Type type,  int id) {
 			this.type = type;
 			this.id = id;
 			this.initVal = 0;
+			this.initStringVal ="";
 		}
 	}
 	
@@ -107,6 +114,14 @@ public class SymbolTable {
         _gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
     }
 
+	void putLocalVarWithInitVal(String varname, Type type, String initVar){
+		//<Fill here>
+		_lsymtable.put(varname,new VarInfo(type,_localVarID++,initVar));
+	}
+	void putGlobalVarWithInitVal(String varname, Type type, String initVar){
+		//<Fill here>
+		_gsymtable.put(varname,new VarInfo(type,_globalVarID++,initVar));
+	}
 
 
 	
@@ -122,6 +137,9 @@ public class SymbolTable {
 			}
 			if(param.type_spec().getText().toUpperCase().equals("DOUBLE")){
 				paramType = Type.DOUBLE;
+			}
+			if(param.type_spec().getText().toUpperCase().equals("STRING")){
+				paramType = Type.STRING;
 			}
 			putLocalVar(paramName,paramType);
 		}
@@ -152,6 +170,9 @@ public class SymbolTable {
         if(type == Type.DOUBLE){
             return "java/io/PrintStream/println(D)V";
         }
+		if(type == Type.STRING){
+			return "java/io/PrintStream/println(Ljava/lang/String;)V";
+		}
 		return "Transration Error : your input a non-exist type";
 	}
 
