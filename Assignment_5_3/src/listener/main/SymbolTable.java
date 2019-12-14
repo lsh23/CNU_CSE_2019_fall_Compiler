@@ -6,6 +6,7 @@ import generated.MiniCParser.Fun_declContext;
 import generated.MiniCParser.Local_declContext;
 import generated.MiniCParser.Var_declContext;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import static listener.main.BytecodeGenListenerHelper.getFunName;
 
 public class SymbolTable {
 	enum Type {
-		INT, INTARRAY, VOID, ERROR, FLOAT, DOUBLE, STRING
+		INT, INTARRAY, VOID, ERROR, FLOAT, DOUBLE, STRING ,FLOATARRAY,DOUBLEARRAY,STRINGARRAY
 	}
 	
 	static public class VarInfo {
@@ -162,16 +163,28 @@ public class SymbolTable {
 
 	public String getPrintFunSpecStr(SymbolTable.Type type){
 		if(type == Type.INT){
-			return "java/io/PrintStream/println(I)V";
+			return "invokevirtual java/io/PrintStream/println(I)V";
 		}
 		if(type == Type.FLOAT){
-			return "java/io/PrintStream/println(F)V";
+			return "invokevirtual java/io/PrintStream/println(F)V";
 		}
         if(type == Type.DOUBLE){
-            return "java/io/PrintStream/println(D)V";
+            return "invokevirtual java/io/PrintStream/println(D)V";
         }
 		if(type == Type.STRING){
-			return "java/io/PrintStream/println(Ljava/lang/String;)V";
+			return "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
+		}
+		if( type == Type.INTARRAY){
+			return "invokestatic java/util/Arrays/toString([I)Ljava/lang/String;\ninvokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
+		}
+		if( type == Type.FLOATARRAY){
+			return "invokestatic java/util/Arrays/toString([F)Ljava/lang/String;\ninvokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
+		}
+		if( type == Type.DOUBLEARRAY){
+			return "invokestatic java/util/Arrays/toString([D)Ljava/lang/String;\ninvokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
+		}
+		if( type == Type.STRINGARRAY){
+			return "invokestatic java/util/Arrays/toString([Ljava/lang/Object;)Ljava/lang/String;\ninvokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
 		}
 		return "Transration Error : your input a non-exist type";
 	}
@@ -220,12 +233,13 @@ public class SymbolTable {
 		if (lvar != null) {
 			return lvar.type;
 		}
+
 		
 		VarInfo gvar = (VarInfo) _gsymtable.get(name);
 		if (gvar != null) {
 			return gvar.type;
 		}
-		
+
 		return Type.ERROR;	
 	}
 	String newLabel() {

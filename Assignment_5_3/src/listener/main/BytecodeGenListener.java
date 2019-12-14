@@ -42,8 +42,20 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 		String varName = ctx.IDENT().getText();
 
 		if (isArrayDecl(ctx)) {
-			symbolTable.putGlobalVar(varName, Type.INTARRAY);
+            if(ctx.getChild(0).getText().equals("int")){
+                symbolTable.putGlobalVar(varName, Type.INTARRAY);
+            }
+            if(ctx.getChild(0).getText().equals("float")){
+                symbolTable.putGlobalVar(varName, Type.FLOATARRAY);
+            }
+            if(ctx.getChild(0).getText().equals("double")){
+                symbolTable.putGlobalVar(varName, Type.DOUBLE);
+            }
+            if(ctx.getChild(0).getText().equals("String")){
+                symbolTable.putGlobalVar(varName, Type.STRINGARRAY);
+            }
 		}
+
 		else if (isDeclWithInit(ctx)) {
 			if(ctx.getChild(0).getText().equals("int")){
 				symbolTable.putGlobalVarWithInitVal(varName, Type.INT, initVal(ctx));
@@ -78,7 +90,20 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 	@Override
 	public void enterLocal_decl(MiniCParser.Local_declContext ctx) {
 		if (isArrayDecl(ctx)) {
-			symbolTable.putLocalVar(getLocalVarName(ctx), Type.INTARRAY);
+            if (isArrayDecl(ctx)) {
+                if(ctx.getChild(0).getText().equals("int")){
+                    symbolTable.putLocalVar(getLocalVarName(ctx), Type.INTARRAY);
+                }
+                if(ctx.getChild(0).getText().equals("float")){
+                    symbolTable.putLocalVar(getLocalVarName(ctx), Type.FLOATARRAY);
+                }
+                if(ctx.getChild(0).getText().equals("double")){
+                    symbolTable.putLocalVar(getLocalVarName(ctx), Type.DOUBLEARRAY);
+                }
+                if(ctx.getChild(0).getText().equals("String")){
+                    symbolTable.putLocalVar(getLocalVarName(ctx), Type.STRINGARRAY);
+                }
+            }
 		}
 		else if (isDeclWithInit(ctx)) {
 			if(ctx.getChild(0).getText().equals("int")) {
@@ -262,8 +287,28 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 				varDecl += "ldc " + ctx.LITERAL().getText() + "\n"
 						+ "astore " + vId + "\n";
 			}
-		}
-
+		}else if (isArrayDecl(ctx)) {
+		    String arrayType ="";
+		    if(ctx.getChild(0).getText().equals("int")) {
+                arrayType = "int";
+            }
+            if(ctx.getChild(0).getText().equals("float")) {
+                arrayType = "float";
+            }
+            if(ctx.getChild(0).getText().equals("double")) {
+                arrayType = "double";
+            }
+            if(ctx.getChild(0).getText().equals("String")) {
+                arrayType = "java/lang/String";
+            }
+		    int array_size = Integer.parseInt(ctx.getChild(3).getText());
+            if(arrayType != "java/lang/String"){
+                varDecl += "ldc "+array_size +"\n"+"newarray "+arrayType+"\n"+"astore "+symbolTable.getVarId(ctx.getChild(1).getText())+"\n";
+            }
+            else{
+                varDecl += "ldc "+array_size +"\n"+"anewarray "+arrayType+"\n"+"astore "+symbolTable.getVarId(ctx.getChild(1).getText())+"\n";
+            }
+        }
 		newTexts.put(ctx, varDecl);
 	}
 
@@ -406,10 +451,40 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 				expr = handleFunCall(ctx, expr);
 			} else { // expr
 				// Arrays: TODO
+                String arrayName = ctx.getChild(0).getText();
+                String type ="";
+                if(symbolTable.getVarType(arrayName) == Type.INTARRAY) {
+                    type = "i";
+                }
+                if(symbolTable.getVarType(arrayName) == Type.FLOATARRAY) {
+                    type = "f";
+                }
+                if(symbolTable.getVarType(arrayName) == Type.DOUBLEARRAY) {
+                    type = "d";
+                }
+                if(symbolTable.getVarType(arrayName) == Type.STRINGARRAY) {
+                    type = "a";
+                }
+                expr = "aload "+symbolTable.getVarId(arrayName)+"\n"+newTexts.get(ctx.getChild(2))+type+"aload\n";
 			}
 		}
 		// IDENT '[' expr ']' '=' expr
-		else { // Arrays: TODO			*/
+		else { // Arrays: TODO
+		    String arrayName = ctx.getChild(0).getText();
+		    String type ="";
+            if(symbolTable.getVarType(arrayName) == Type.INTARRAY) {
+                type = "ia";
+            }
+            if(symbolTable.getVarType(arrayName) == Type.FLOATARRAY) {
+                type = "fa";
+            }
+            if(symbolTable.getVarType(arrayName) == Type.DOUBLEARRAY) {
+                type = "da";
+            }
+            if(symbolTable.getVarType(arrayName) == Type.STRINGARRAY) {
+                type = "aa";
+            }
+		    expr = "aload "+symbolTable.getVarId(ctx.getChild(0).getText())+"\n"+newTexts.get(ctx.getChild(2))+newTexts.get(ctx.getChild(5))+type+"store\n";
 		}
 		newTexts.put(ctx, expr);
 	}
@@ -590,22 +665,37 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
             }
             else{
                 Type t = symbolTable.getVarType(calle_func_name);
-                if(t == Type.INT){
+                if(t == Type.INT || t == Type.INTARRAY && ctx.args().expr(0).children.size() == 4){
                     print_type = Type.INT;
                 }
-                if(t == Type.FLOAT) {
+                else if(t == Type.FLOAT || t == Type.FLOATARRAY && ctx.args().expr(0).children.size() == 4) {
                     print_type = Type.FLOAT;
                 }
-                if(t == Type.DOUBLE) {
+                else if(t == Type.DOUBLE || t == Type.DOUBLEARRAY && ctx.args().expr(0).children.size() == 4) {
                     print_type = Type.DOUBLE;
                 }
-				if(t == Type.STRING) {
+				else if(t == Type.STRING || t == Type.STRINGARRAY && ctx.args().expr(0).children.size() == 4) {
 					print_type = Type.STRING;
-				}
+				}else if( t == Type.INTARRAY ){
+				    print_type = Type.INTARRAY;
+                }else if( t == Type.FLOATARRAY ){
+                    print_type = Type.FLOATARRAY;
+                }else if( t == Type.DOUBLEARRAY ){
+                    print_type = Type.DOUBLEARRAY;
+                }else if( t == Type.STRINGARRAY ){
+                    print_type = Type.STRINGARRAY;
+                }
             }
-            expr = "getstatic java/lang/System/out Ljava/io/PrintStream; " + "\n"
-					+ newTexts.get(ctx.args())
-					+ "invokevirtual " + symbolTable.getPrintFunSpecStr(print_type) + "\n";
+            if(print_type == Type.INT || print_type == Type.FLOAT || print_type == Type.DOUBLE || print_type == Type.STRING) {
+				expr = "getstatic java/lang/System/out Ljava/io/PrintStream; " + "\n"
+						+ newTexts.get(ctx.args())
+						+ symbolTable.getPrintFunSpecStr(print_type) + "\n";
+			}else{
+				expr = "getstatic java/lang/System/out Ljava/io/PrintStream; " + "\n"
+						+ newTexts.get(ctx.args())
+						+ "aload " + symbolTable.getVarId(ctx.getChild(2).getText())+"\n"
+						+ symbolTable.getPrintFunSpecStr(print_type) + "\n";
+			}
 		} else {
 			expr = newTexts.get(ctx.args())
 					+ "invokestatic " + getCurrentClassName()+ "/" + symbolTable.getFunSpecStr(fname) + "\n";
