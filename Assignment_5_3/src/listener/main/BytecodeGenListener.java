@@ -307,6 +307,7 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
             }
             else{
                 varDecl += "ldc "+array_size +"\n"+"anewarray "+arrayType+"\n"+"astore "+symbolTable.getVarId(ctx.getChild(1).getText())+"\n";
+                //String의 경우에는 anewarray로 처리해준다.
             }
         }
 		newTexts.put(ctx, varDecl);
@@ -439,6 +440,7 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 							"invokespecial java/lang/StringBuilder/<init>()V\n";
 					expr = newStringBuilder+newTexts.get(ctx.expr(0))
 							+ "astore " + symbolTable.getVarId(ctx.IDENT().getText()) + " \n";
+					// String의 경우에는 StringBuilder를 통해서 객체에 저장해주도록 한다.
 				}
 
 			} else { 											// binary operation
@@ -549,6 +551,8 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 			String id_2 = symbolTable.getVarId(ctx.getChild(2).getText());
 			String end = "invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;";
 			return "aload "+id_1+"\n"+append_bytecode+"\n"+"aload "+id_2+"\n"+append_bytecode+"\n"+end+"\n";
+			//String의 경우에는 StringBuilder의 append를 이용해서 두 문자를 이어준다.
+			//단이경우에는 String 타입의 경우 입력이 Stirng + String 만 들어온다고 가정 한 상황이다.
 		}
 
 		String l2 = symbolTable.newLabel();
@@ -695,6 +699,7 @@ public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeL
 						+ newTexts.get(ctx.args())
 						+ "aload " + symbolTable.getVarId(ctx.getChild(2).getText())+"\n"
 						+ symbolTable.getPrintFunSpecStr(print_type) + "\n";
+				//배열의 경우
 			}
 		} else {
 			expr = newTexts.get(ctx.args())
